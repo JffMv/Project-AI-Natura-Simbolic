@@ -5,7 +5,11 @@ import lombok.Getter;
 import lombok.Setter;
 import org.jpl7.Query;
 import org.jpl7.Term;
-import org.jpl7.Variable;
+
+import java.io.*;
+import java.util.Arrays;
+import java.util.List;
+import java.net.URL;
 
 @Setter
 @Getter
@@ -21,30 +25,38 @@ public class Product {
     private String precio;
     private String quieroEstaTecnologia;
 
-    public String process(){
-        String githubRawUrl = "https://github.com/JffMv/prolog-AI/blob/main/proyecto%20final%20IA.pl";
-        Query.hasSolution("consult('" + githubRawUrl + "')");
+    public String process() {
+        String githubRawUrl = "https://raw.githubusercontent.com/JffMv/prolog-AI/main/proyecto%20final%20IA.pl";
 
-        // Define los parámetros que deseas pasar a la regla
-        //Term arg1 = new Variable("P");
-        //Term arg2 = new Variable("Arg2");
+        System.out.println("paso 1");
+        String loadQuery = "consult('" + githubRawUrl + "')";
+        Query loadQueryObj = new Query(loadQuery);
+        System.out.println("paso 3");
 
-        // Construye la consulta Prolog con la regla y los parámetros
-        Query query = new Query("consultaConDuplicados(P)" );
+        if (loadQueryObj.hasSolution()) {
+            System.out.println("Carga del código Prolog exitosa");
 
-        if (query.hasSolution()) {
-            Term result1 = query.getSolution().get("P");
-            query.close();
-            System.out.println("Resultado 1: " + result1);
-            setName(result1.toString());
-            return result1.toString();
+            // Ahora puedes realizar consultas adicionales
+            String consulta = "consultaConDuplicados(RESULTADO)";
+            Query queryObj = new Query(consulta);
+
+            // Ejecutar la consulta
+            if (queryObj.hasSolution()) {
+                String resultadoString = queryObj.oneSolution().get("RESULTADO").toString();
+                String[] resultadoArray = resultadoString.split(",");
+                List<String> resultadoList = Arrays.asList(resultadoArray);
+                setName(resultadoList.get(0));
+                while (queryObj.hasMoreSolutions()) {
+                    Term solution = queryObj.nextSolution().get("Variable");
+                    System.out.println("Resultado: " + solution.toString());
+                }
+            } else {
+                System.out.println("La consulta no tiene solución.");
+            }
         } else {
-            System.out.println("No hay solución para la consulta.");
-            return "No hay solución para la consulta.";
+            System.out.println("Error al cargar el código Prolog");
         }
-
-
-
-
+    return "";
     }
+
 }
