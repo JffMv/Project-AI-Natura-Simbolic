@@ -18,3 +18,4 @@ public class AIcontroller {
         return new ResponseEntity<>("{\"productName\": \"" + productName + "\"}", HttpStatus.ACCEPTED);
     }
 }
+
